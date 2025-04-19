@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 13, 2025 at 03:09 PM
+-- Generation Time: Apr 19, 2025 at 08:26 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,14 +44,16 @@ CREATE TABLE `accommodation` (
 
 CREATE TABLE `event` (
   `event_id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `max_participants` int(11) DEFAULT NULL,
   `registration_fee` decimal(10,2) DEFAULT NULL,
-  `category` varchar(100) DEFAULT NULL,
+  `category` varchar(50) DEFAULT NULL,
   `rules` text DEFAULT NULL,
-  `team_allowed` tinyint(1) DEFAULT 0,
-  `max_team_participants_limit` int(11) DEFAULT NULL
+  `team_allowed` tinyint(1) DEFAULT NULL,
+  `max_team_participants_limit` int(11) DEFAULT NULL,
+  `organizer_id` int(11) DEFAULT NULL,
+  `accepted` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -120,7 +122,6 @@ CREATE TABLE `payment` (
 CREATE TABLE `score` (
   `score_id` int(11) NOT NULL,
   `team_id` varchar(100) DEFAULT NULL,
-  `judge_id` int(11) DEFAULT NULL,
   `event_round_id` int(11) DEFAULT NULL,
   `score` decimal(5,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -148,7 +149,7 @@ CREATE TABLE `sponsorship` (
   `id` int(11) NOT NULL,
   `sponsor_id` int(11) DEFAULT NULL,
   `package_id` int(11) DEFAULT NULL,
-  `payment_status` tinyint(1) DEFAULT 0
+  `payment_status` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -159,9 +160,9 @@ CREATE TABLE `sponsorship` (
 
 CREATE TABLE `sponsorship_package` (
   `package_id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
   `perks` text DEFAULT NULL,
-  `price` decimal(10,2) NOT NULL
+  `price` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -172,10 +173,10 @@ CREATE TABLE `sponsorship_package` (
 
 CREATE TABLE `user` (
   `user_id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `contact` varchar(15) DEFAULT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `contact` varchar(20) DEFAULT NULL,
   `role` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -187,7 +188,7 @@ CREATE TABLE `user` (
 
 CREATE TABLE `venue` (
   `venue_id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
   `location` varchar(255) DEFAULT NULL,
   `type` varchar(50) DEFAULT NULL,
   `capacity` int(11) DEFAULT NULL
@@ -208,7 +209,8 @@ ALTER TABLE `accommodation`
 -- Indexes for table `event`
 --
 ALTER TABLE `event`
-  ADD PRIMARY KEY (`event_id`);
+  ADD PRIMARY KEY (`event_id`),
+  ADD KEY `organizer_id` (`organizer_id`);
 
 --
 -- Indexes for table `event_round`
@@ -248,8 +250,7 @@ ALTER TABLE `payment`
 --
 ALTER TABLE `score`
   ADD PRIMARY KEY (`score_id`),
-  ADD KEY `event_round_id` (`event_round_id`),
-  ADD KEY `judge_id` (`judge_id`);
+  ADD KEY `event_round_id` (`event_round_id`);
 
 --
 -- Indexes for table `sponsor`
@@ -372,6 +373,12 @@ ALTER TABLE `accommodation`
   ADD CONSTRAINT `accommodation_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
 
 --
+-- Constraints for table `event`
+--
+ALTER TABLE `event`
+  ADD CONSTRAINT `event_ibfk_1` FOREIGN KEY (`organizer_id`) REFERENCES `user` (`user_id`);
+
+--
 -- Constraints for table `event_round`
 --
 ALTER TABLE `event_round`
@@ -404,8 +411,7 @@ ALTER TABLE `payment`
 -- Constraints for table `score`
 --
 ALTER TABLE `score`
-  ADD CONSTRAINT `score_ibfk_1` FOREIGN KEY (`event_round_id`) REFERENCES `event_round` (`event_round_id`),
-  ADD CONSTRAINT `score_ibfk_2` FOREIGN KEY (`judge_id`) REFERENCES `judge` (`judge_id`);
+  ADD CONSTRAINT `score_ibfk_1` FOREIGN KEY (`event_round_id`) REFERENCES `event_round` (`event_round_id`);
 
 --
 -- Constraints for table `sponsor`

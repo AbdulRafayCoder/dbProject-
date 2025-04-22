@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 19, 2025 at 08:26 PM
+-- Generation Time: Apr 22, 2025 at 03:53 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -168,6 +168,25 @@ CREATE TABLE `sponsorship_package` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tokens`
+--
+
+CREATE TABLE `tokens` (
+  `token` varchar(255) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tokens`
+--
+
+INSERT INTO `tokens` (`token`, `user_id`, `created_at`) VALUES
+('6a20f3185d5934cfb9d5dcdee083a28067e16ef0f560d1a9393c36ab9ea295c6', 3, '2025-04-22 13:45:18');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `user`
 --
 
@@ -179,6 +198,13 @@ CREATE TABLE `user` (
   `contact` varchar(20) DEFAULT NULL,
   `role` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`user_id`, `name`, `email`, `password`, `contact`, `role`) VALUES
+(3, 'admin1', 'admin@admin.com', '$2b$10$jjusvNuRpMnn//V/xivrOeNl60BJCGzhoLoDJH1TzbFuNGdHhm5P6', '03333333', 'admin');
 
 -- --------------------------------------------------------
 
@@ -193,6 +219,13 @@ CREATE TABLE `venue` (
   `type` varchar(50) DEFAULT NULL,
   `capacity` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `venue`
+--
+
+INSERT INTO `venue` (`venue_id`, `name`, `location`, `type`, `capacity`) VALUES
+(1, 'c301', 'C block', 'room', 10);
 
 --
 -- Indexes for dumped tables
@@ -272,6 +305,13 @@ ALTER TABLE `sponsorship`
 --
 ALTER TABLE `sponsorship_package`
   ADD PRIMARY KEY (`package_id`);
+
+--
+-- Indexes for table `tokens`
+--
+ALTER TABLE `tokens`
+  ADD PRIMARY KEY (`token`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `user`
@@ -354,13 +394,13 @@ ALTER TABLE `sponsorship_package`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `venue`
 --
 ALTER TABLE `venue`
-  MODIFY `venue_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `venue_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
@@ -425,6 +465,12 @@ ALTER TABLE `sponsor`
 ALTER TABLE `sponsorship`
   ADD CONSTRAINT `sponsorship_ibfk_1` FOREIGN KEY (`sponsor_id`) REFERENCES `sponsor` (`sponsor_id`),
   ADD CONSTRAINT `sponsorship_ibfk_2` FOREIGN KEY (`package_id`) REFERENCES `sponsorship_package` (`package_id`);
+
+--
+-- Constraints for table `tokens`
+--
+ALTER TABLE `tokens`
+  ADD CONSTRAINT `tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
